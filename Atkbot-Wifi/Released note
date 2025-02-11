@@ -1,0 +1,21 @@
+ATK BOT WI-FI
+
+Descriptions:
+multiplayer humanoid robots with wifi to start communications
+
+Tools & Parts :
+1.Microcontrollers :
+-Rasberry pico w (to control wifi communications)
+-Arduino Nano (to control robot motions)
+2.I2c parts :
+-Pca9685
+-Oled lcd 
+3.Small parts :
+-Light dependent resistors
+-Led 
+-Buttons
+-Wires
+-Resistor 10k
+-Resistor 220 ohm
+-Pin header (if needed)
+
