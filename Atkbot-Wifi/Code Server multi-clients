@@ -6,8 +6,8 @@ import ssd1306
 import _thread
 
 # Konfigurasi Wi-Fi
-ssid = "YourSSID"
-password = "YourPassword"
+ssid = "Alamak"
+password = "ndaktaukoktanyasaya"
 
 # Inisialisasi OLED
 i2c = machine.I2C(0, scl=machine.Pin(21), sda=machine.Pin(20))
@@ -44,7 +44,7 @@ custom_print("IP Address:\n" + wlan.ifconfig()[0])
 
 # Konfigurasi Server
 host_ip = wlan.ifconfig()[0]
-port = 50003 #identify available port
+port = 50003
 
 # Inisialisasi server
 try:
