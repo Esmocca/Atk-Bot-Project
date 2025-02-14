@@ -1,9 +1,10 @@
 # Code HAB-W for multi clients
-# Identify your ip based on region
+# Identify your hp based on region
 # Change client_name for client 2 or else 
 # Atk button disabled while blocking
 # Redled for hp indicator & atk received
 # Blocking consume energy by -1 of current energy
+# yellow led light for energy indicator
 
 import socket
 import machine
@@ -14,11 +15,11 @@ import _thread
 from machine import Pin, I2C
 
 # Inisiasi nama klien
-client_name = "Stellar"  # Ganti dengan "Client2" untuk klien kedua
+client_name = "Griffith"  # Ganti dengan "Client2" untuk klien kedua
 
 # Konfigurasi Wi-Fi
-ssid = "YourSSID"
-password = "YourPassword"
+ssid = "Alamak"
+password = "ndaktaukoktanyasaya"
 
 # Inisialisasi I2C untuk OLED
 i2c = I2C(0, scl=Pin(21), sda=Pin(20))
@@ -53,13 +54,14 @@ custom_print(f"{client_name} connected to Wi-Fi!")
 custom_print("IP Address:\n" + wlan.ifconfig()[0])
 
 # Konfigurasi server
-server_ip = "192.168.--.--"  # identify your local server
+server_ip = "192.168.207.96"  # IP server yang telah terdeteksi jika tidak berhasil coba ini "192.168.32.96"
 server_port = 50003
 
 # Pin tombol
 atk_pin = Pin(14, Pin.IN, Pin.PULL_UP)
 block_pin = Pin(15, Pin.IN, Pin.PULL_UP)
 rled_pin = Pin(5, Pin.OUT)  # LED merah mati saat inisialisasi
+yled_pin = Pin(4, Pin.OUT)  #LED kuning untuk energy indicator
 
 # Status robot
 hp = 100
@@ -106,6 +108,11 @@ def main():
                 if energy > energy_max:
                     energy = energy_max
             last_energy_regen = current_time
+            
+        if energy > 0:
+            yled_pin.value(0)  # Matikan LED kuning
+        else:
+            yled_pin.value(1)  # Nyalakan LED kuning
 
         # Menampilkan statistik robot
         stats = f"{client_name}\nHP: {hp}\nATK: {atk}\nDEF: {defense}\nENGY: {energy}"
@@ -151,6 +158,8 @@ def main():
             else:
                 isblocking = False
                 custom_print("Low Energy!")
+                yled_pin.value(1)
+
         else:
             isblocking = False
 
@@ -168,7 +177,8 @@ def main():
                     except OSError as e:
                         custom_print(f"Send error: {e}")
             else:
-                custom_print("Low energy!\nWait 5s.")
+                custom_print("Low energy!")
+                yled_pin.value(1)
 
         # Memastikan tombol dilepaskan sebelum bisa mendeteksi penekanan berikutnya
         if atk_pin.value() == 1:
@@ -177,4 +187,5 @@ def main():
         time.sleep(0.1)
 
 main()
+
 
