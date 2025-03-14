@@ -524,7 +524,7 @@ void handleAtkState() {
         }
         break;
 
-      case 2:  // Animasi serangan 3
+      case 2:  // Animasi serangan 3 -+
         if (currentTime - lastAtkTime < 200) {
 
          setServoAngle(SERVO_PINGGANG, 60);
