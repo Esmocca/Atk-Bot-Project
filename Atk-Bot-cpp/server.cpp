@@ -6,9 +6,9 @@
 #define LCD_SCL 17
 
 
-const char* ssid = "Alamak";
-const char* password = "ndaktaukoktanyasaya";
-int port = 50003;
+const char* ssid = "------";
+const char* password = "----------";
+int port = 50---;
 WiFiServer server(port);
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
