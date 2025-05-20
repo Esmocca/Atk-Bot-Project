@@ -1,5 +1,6 @@
 # Atk-bot-
 Atk bot project log:
+
 Plan HAB-W programs :
 HAB-W : Humanoid Atk Bot Wi-fi
 - Tambahkan stance position (weapon)✔️
