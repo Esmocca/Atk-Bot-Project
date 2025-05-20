@@ -1,160 +1,245 @@
 #include <WiFi.h>
-#include <Adafruit_SSD1306.h>
 #include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
-// Konfigurasi Wi-Fi
+#define LCD_SDA 16
+#define LCD_SCL 17
+
+
 const char* ssid = "Alamak";
 const char* password = "ndaktaukoktanyasaya";
+int port = 50003;
+WiFiServer server(port);
 
-// Konfigurasi OLED
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64
-#define OLED_RESET    -1
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-// Konfigurasi Server
-WiFiServer server(50003);
-WiFiClient clients[5]; // Maksimal 5 klien
-int numClients = 0;
-bool communicationStarted = false;
+byte fullBar[8] = {
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111
+};
 
-String clientNames[2];
-int wins[2] = {0, 0};
-int roundCount = 1;
+struct ClientData {
+  WiFiClient client;
+  String name;
+  int lifePoints = 3;
+};
 
-void displayOnOLED(const String &text) {
-    display.clearDisplay();
-    display.setTextColor(SSD1306_WHITE);
-    display.setCursor(0, 0);
+template <class T>
+class DNode {
+public:
+  T data;
+  DNode<T>* next;
+  DNode<T>* prev;
+  DNode(const T& d, DNode<T>* p = nullptr, DNode<T>* n = nullptr)
+    : data(d), prev(p), next(n) {}
+};
+
+template <class T>
+class DoublyLinkedList {
+private:
+  DNode<T>* head;
+  DNode<T>* tail;
+public:
+  DoublyLinkedList() : head(nullptr), tail(nullptr) {}
+  ~DoublyLinkedList() {
+    while (head) {
+      DNode<T>* tmp = head;
+      head = head->next;
+      delete tmp;
+    }
+  }
+  void insertBack(const T& data) {
+    DNode<T>* newNode = new DNode<T>(data, tail, nullptr);
+    if (tail) {
+      tail->next = newNode;
+    } else {
+      head = newNode;
+    }
+    tail = newNode;
+  }
+  void removeNode(DNode<T>* node) {
+    if (!node) return;
+    if (node->prev)
+      node->prev->next = node->next;
+    else
+      head = node->next;
+    if (node->next)
+      node->next->prev = node->prev;
+    else
+      tail = node->prev;
+    delete node;
+  }
+  DNode<T>* getHead() {
+    return head;
+  }
+  int count() {
+    int c = 0;
+    DNode<T>* temp = head;
+    while (temp) {
+      c++;
+      temp = temp->next;
+    }
+    return c;
+  }
+};
+
+DoublyLinkedList<ClientData> clientList;
+bool gameStarted = false;
+
+void connectToWiFi() {
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+    }
+    server.begin();
     
-    String lines[6];
-    int lineIndex = 0;
-    int start = 0;
-    
-    // Split text into lines
-    for(int i = 0; i < text.length() && lineIndex < 6; i++) {
-        if(text[i] == '\n' || (i - start) >= 16) {
-            lines[lineIndex++] = text.substring(start, i);
-            start = i + 1;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("IP: ");
+    lcd.print(WiFi.localIP());
+    lcd.setCursor(0, 1);
+    lcd.print("Port: ");
+    lcd.print(port);
+  }
+}
+
+void displayGameStart() {
+  lcd.clear();
+  lcd.setCursor(3, 0);
+  lcd.print("Game Start!");
+  delay(3000);
+  gameStarted = true;
+}
+
+void displayScoreboard() {
+  static int lastP1LP = -1, lastP2LP = -1;
+  DNode<ClientData>* current = clientList.getHead();
+  if (!current || !current->next) return;
+
+  if (current->data.lifePoints == lastP1LP && current->next->data.lifePoints == lastP2LP) {
+    return; 
+  }
+  
+  lastP1LP = current->data.lifePoints;
+  lastP2LP = current->next->data.lifePoints;
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("P1");
+  lcd.setCursor(14, 0);
+  lcd.print("P2");
+
+  lcd.setCursor(0, 1);
+  for (int i = 0; i < current->data.lifePoints; i++) {
+    lcd.write(byte(0)); 
+  }
+  lcd.setCursor(13, 1);
+  for (int i = 0; i < current->next->data.lifePoints; i++) {
+    lcd.write(byte(0)); 
+  }
+}
+
+void mainServer() {
+  WiFiClient newClient = server.accept();
+  if (newClient) {
+    String clientName = "Player_" + String(random(1, 99)); 
+    ClientData cd;
+    cd.client = newClient;
+    cd.name = clientName;
+    clientList.insertBack(cd);
+  }
+  
+  if (clientList.count() == 2 && !gameStarted) {
+    displayGameStart();
+  }
+  
+  if (gameStarted) {
+    displayScoreboard();
+  }
+
+  bool gameOver = false;
+  
+  DNode<ClientData>* current = clientList.getHead();
+  while (current != nullptr) {
+    WiFiClient &client = current->data.client;
+    if (client && client.available()) {
+      String data = client.readStringUntil('\n');
+      data.trim();
+      Serial.println("Received: " + data);
+
+      if (data.endsWith("defeated!")) {
+        current->data.lifePoints--;
+        
+        if (current->data.lifePoints == 0) {
+          gameOver = true;
+          lcd.clear();
+          lcd.setCursor(3, 0);
+          lcd.print("Game Over");
+          //lcd.print(current->next ? current->next->data.name : "?");
+          delay(5000);
+          lcd.clear();
+          gameStarted = false;
+          break;
         }
+      }
+
+      DNode<ClientData>* receiver =  clientList.getHead();
+      while (receiver != nullptr){
+        if (receiver != current  && receiver->data.client.connected()) {
+          receiver ->data.client.println(data);
+        }
+        receiver = receiver->next;
+      }
+      displayScoreboard();
     }
-    if(lineIndex < 6 && start < text.length()) {
-        lines[lineIndex] = text.substring(start);
+
+    if (!client.connected()) {
+      DNode<ClientData>* toDelete = current;
+      current = current->next;
+      clientList.removeNode(toDelete);
+    } else {
+      current = current->next;
     }
-    
-    // Display lines
-    for(int i = 0; i < 6; i++) {
-        display.setCursor(0, i * 10);
-        display.print(lines[i]);
+  }
+  
+  if (clientList.count() == 2) {
+    DNode<ClientData>* p1 = clientList.getHead();
+    DNode<ClientData>* p2 = p1->next;
+    if (p1->data.lifePoints == 0 && p2->data.lifePoints == 0) {
+      lcd.clear();
+      lcd.setCursor(3, 0);
+      lcd.print("DRAW!");
+      delay(5000);
+      lcd.clear();
+      gameStarted = false;
     }
-    display.display();
+  }
 }
 
-void customPrint(const String &text) {
-    Serial.println(text);
-    displayOnOLED(text);
-}
 
 void setup() {
-    Serial.begin(115200);
-
-    //Inisialisasi OLED
-    Wire.setSDA(20);
-    Wire.setSCL(21);
-    Wire.begin();
-    
-    // Inisialisasi OLED
-    if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-        Serial.println(F("OLED failed"));
-        while(1);
-    }
-    display.setTextSize(1);
-    
-    // Koneksi Wi-Fi
-    customPrint("Connecting to\nWi-Fi...");
-    WiFi.begin(ssid, password);
-    
-    while(WiFi.status() != WL_CONNECTED) {
-        delay(100);
-    }
-    
-    customPrint("Connected to\nWi-Fi!\nIP: " + WiFi.localIP().toString());
-    
-    // Mulai server
-    server.begin();
-    customPrint("Server ready\nPort 50003");
+  Serial.begin(115200);
+  Wire.setSDA(LCD_SDA);
+  Wire.setSCL(LCD_SCL);
+  Wire.begin();
+  lcd.init();
+  lcd.backlight();
+  lcd.createChar(0, fullBar); 
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Wi-Fi Connecting...");
+  delay(2000);
+  connectToWiFi();
 }
 
 void loop() {
-   // Terima koneksi baru
-    if(numClients < 2) {
-        WiFiClient newClient = server.available();
-        if(newClient) {
-            String clientName = newClient.readStringUntil('\n');
-            clientName.trim();
-            if(clientName.length() > 0) {
-                clients[numClients] = newClient;
-                clientNames[numClients] = clientName;
-                numClients++;
-                customPrint("Player" + String(numClients) + " connected\n" + clientName);
-                if(numClients == 2) {
-                    communicationStarted = true;
-                    customPrint("Game Start!\nRound" + String(roundCount));
-                }
-            } else {
-                newClient.stop();
-            }
-        }
-    }
-    
-    // Baca data dari klien
-    for(int i = 0; i < numClients; i++) {
-        if(clients[i] && clients[i].available()) {
-            String data = clients[i].readStringUntil('\n');
-            data.trim();
-            customPrint("Received:\n" + data);
-            
-            if(data.endsWith("defeated!")) {
-                String winner = clientNames[(i + 1) % 2];
-                wins[(i + 1) % 2]++;
-                customPrint(winner + " Win!\nRound" + String(roundCount) + " over");
-                roundCount++;
-                if(wins[(i + 1) % 2] == 3) {
-                    customPrint(winner + " is the\nfinal winner!");
-                    // Reset game
-                    numClients = 0;
-                    communicationStarted = false;
-                    roundCount = 1;
-                    wins[0] = wins[1] = 0;
-                    for(int j = 0; j < 2; j++) {
-                        clients[j].stop();
-                    }
-                } else {
-                    customPrint("Next Round\nRound" + String(roundCount));
-                }
-            }
-            
-            // Kirim ke klien lain
-            for(int j = 0; j < numClients; j++) {
-                if(j != i && clients[j].connected()) {
-                    clients[j].println(data);
-                }
-            }
-        }
-    }
-    
-    // Cek koneksi klien
-    for(int i = 0; i < numClients; i++) {
-        if(!clients[i].connected()) {
-            clients[i].stop();
-            // Geser array
-            for(int j = i; j < numClients-1; j++) {
-                clients[j] = clients[j+1];
-                clientNames[j] = clientNames[j+1];
-            }
-            numClients--;
-            customPrint("Player" + String(i+1) + "\ndisconnected");
-        }
-    }
+  connectToWiFi();
+  mainServer();
 }
-    
