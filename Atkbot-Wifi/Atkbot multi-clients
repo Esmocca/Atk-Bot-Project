@@ -18,8 +18,8 @@ from machine import Pin, I2C
 client_name = "Griffith"  # Ganti dengan "Client2" untuk klien kedua
 
 # Konfigurasi Wi-Fi
-ssid = "Alamak"
-password = "ndaktaukoktanyasaya"
+ssid = "------"
+password = "---------"
 
 # Inisialisasi I2C untuk OLED
 i2c = I2C(0, scl=Pin(21), sda=Pin(20))
