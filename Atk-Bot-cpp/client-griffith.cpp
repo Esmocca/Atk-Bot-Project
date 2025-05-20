@@ -30,12 +30,12 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, -1);
 #define SERVO_TELAPAKKIRI 10
   
 // Konfigurasi Wi-Fi
-const char* ssid = "Alamak";
-const char* password = "ndaktaukoktanyasaya";
+const char* ssid = "----";
+const char* password = "------";
 
 // Konfigurasi Server
-const char* serverIP = "192.168.17.96";
-const int serverPort = 50003;
+const char* serverIP = "192.168.------";
+const int serverPort = 50---;
 
 // Konfigurasi Klien
 const String clientName = "Griffith"; // Ganti untuk client kedua
