@@ -6,8 +6,8 @@
 #define LCD_SCL 17
 
 
-const char* ssid = "------";
-const char* password = "----------";
+const char* ssid = "-----";
+const char* password = "--------";
 int port = 50---;
 WiFiServer server(port);
 
