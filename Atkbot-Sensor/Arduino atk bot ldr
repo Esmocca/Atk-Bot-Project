@@ -1,6 +1,7 @@
 // Atk_Sensor_Character V2
 // Features: 
-// Added skill_button, skill cooldown, and skill critrate% & critDMG%
+// Added skill_button, skill cooldown, and skill critrate % & crit DMG%
+
 #include<Servo.h>
 
 #define skill_pin 12
@@ -23,7 +24,7 @@ int damage =0;
 int hp = 30;
 int deff = 800;
 int atk = 300;
-float critRate = 0.2; // Crit rate 20%
+float critRate = 0.3; // Crit rate 30%
 float critDMG = 1.0; // Crit DMG 100% (default duration * 1.0)
 
 // Attack button
