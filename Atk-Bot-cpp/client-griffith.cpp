@@ -1,3 +1,4 @@
+// Hab-w weapon stance position
 #include <WiFi.h>
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
@@ -30,25 +31,25 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, -1);
 #define SERVO_TELAPAKKIRI 10
   
 // Konfigurasi Wi-Fi
-const char* ssid = "----";
-const char* password = "------";
+const char* ssid = "Alamak";
+const char* password = "ndaktaukoktanyasaya";
 
 // Konfigurasi Server
-const char* serverIP = "192.168.------";
-const int serverPort = 50---;
+const char* serverIP = "10.233.195.2";
+const int serverPort = 50003;
 
 // Konfigurasi Klien
-const String clientName = "Griffith"; // Ganti untuk client kedua
+const String clientName = "Esmocca"; // Ganti untuk client kedua
 
 // Status robot
-int hp = 100;
+int hp = 400;
 int atk = 30;
-int defense = 20; // Defense dalam persen (misalnya 20 berarti mengurangi damage sebesar 20%)
+int defense = 30; // Defense dalam persen (misalnya 20 berarti mengurangi damage sebesar 20%)
 int strength = 10;   // Strength dalam persen (misalnya 10 berarti menambah 10% damage dari atk)
-int energy = 30;
-const int energyMax = 30;
+int energy = 150;
+const int energyMax = 150;
 const int energyRegen = 10;
-const unsigned long energyInterval = 5000;
+const unsigned long energyInterval = 10000;
 bool robotAlive = true;
 int hpstats = hp;
 
@@ -192,14 +193,14 @@ void setIdlePosition() {
   setServoAngle(SERVO_BAHUKANAN, 80);//-kanan +kiri
   setServoAngle(SERVO_TANGANKIRI, 130);// - semakin kecil semakin kedepan
   setServoAngle(SERVO_PUNGGUNG, 75);//-semakin kecil semakin naik
-  setServoAngle(SERVO_SIKUKANAN, 60);//- semakin kecil semakin kebelakang
+  setServoAngle(SERVO_SIKUKANAN, 40);//- semakin kecil semakin kebelakang
   setServoAngle(SERVO_PINGGANG, 40);//-semakin besar semakin ke kiri
   setServoAngle(SERVO_KAKIKANAN, 70);// -semakin besar semakin kedepan
-  setServoAngle(SERVO_KAKIKIRI, 30);// -semakin kecil semakin kedepan
+  setServoAngle(SERVO_KAKIKIRI, 25);// -semakin kecil semakin kedepan
   setServoAngle(SERVO_LUTUTKANAN , 10);// -semakin kecil semakin lurus
   setServoAngle(SERVO_LUTUTKIRI , 130);// -semakin besar semakin lurus
-  setServoAngle(SERVO_TELAPAKKANAN , 70);// -semakin besar semakin maju
-  setServoAngle(SERVO_TELAPAKKIRI , 75);// -semakin kecil semakin maju
+  setServoAngle(SERVO_TELAPAKKANAN , 65);// -semakin besar semakin maju
+  setServoAngle(SERVO_TELAPAKKIRI , 80);// -semakin kecil semakin maju
 
 }
 
@@ -312,7 +313,7 @@ void handleBlockAtkmotion() {
       setServoAngle(SERVO_TANGANKIRI, 70); 
       setServoAngle(SERVO_PINGGANG, 10);
       Serial.println("BlockingAtkMotion");
-      delay(100);
+      delay(50);
     } 
     if (currentTime - blockingAtkMotionStart > 400){
       setIdlePosition();
@@ -442,8 +443,8 @@ void setIdleAnimation()
       setServoAngle(SERVO_PUNGGUNG, 75 + offset);      // Punggung
       setServoAngle(SERVO_SIKUKANAN, 60 + offset);      // Siku kanan
       setServoAngle(SERVO_PINGGANG, 40 + offset);       // Pinggang
-      setServoAngle(SERVO_KAKIKANAN, 70 + offset);      // Kaki kanan
-      setServoAngle(SERVO_KAKIKIRI, 30 + offset);       // Kaki kiri
+      // setServoAngle(SERVO_KAKIKANAN, 70 + offset);      // Kaki kanan
+      // setServoAngle(SERVO_KAKIKIRI, 30 + offset);       // Kaki kiri
     }
   }
 }
@@ -479,11 +480,11 @@ void handleAtkState() {
           setServoAngle(SERVO_PINGGANG, 120);
           setServoAngle(SERVO_PUNGGUNG, 50);
           setServoAngle(SERVO_BAHUKANAN, 150);
-          setServoAngle(SERVO_LUTUTKIRI , 120);// -semakin besar semakin lurus
-          setServoAngle(SERVO_TELAPAKKIRI , 60);// -semakin kecil semakin maju
+          // setServoAngle(SERVO_LUTUTKIRI , 120);// -semakin besar semakin lurus
           setServoAngle(SERVO_SIKUKANAN, 80);//- semakin kecil semakin kebelakang
+          // setServoAngle(SERVO_KAKIKIRI, 20);// -semakin kecil semakin kedepan
           delay(50);
-        } else if (currentTime - lastAtkTime < 600) {
+        } else if (currentTime - lastAtkTime < 500) {
           setServoAngle(SERVO_PINGGANG, 20);
           setServoAngle(SERVO_PUNGGUNG, 50);
           setServoAngle(SERVO_BAHUKANAN, 40);
@@ -505,13 +506,13 @@ void handleAtkState() {
           setServoAngle(SERVO_PUNGGUNG, 50);
           setServoAngle(SERVO_BAHUKANAN, 90);
           setServoAngle(SERVO_SIKUKANAN, 90);//- semakin kecil semakin kebelakang
+          // setServoAngle(SERVO_KAKIKIRI, 20);// -semakin kecil semakin kedepan
           delay(50);
-        } else if (currentTime - lastAtkTime < 600) {
+        } else if (currentTime - lastAtkTime < 500) {
           setServoAngle(SERVO_PUNGGUNG, 50);
           setServoAngle(SERVO_PINGGANG, 120);
           setServoAngle(SERVO_BAHUKANAN, 140);
-          setServoAngle(SERVO_LUTUTKIRI , 120);// -semakin besar semakin lurus
-          setServoAngle(SERVO_TELAPAKKIRI , 60);// -semakin kecil semakin maju
+          // setServoAngle(SERVO_LUTUTKIRI , 120);// -semakin besar semakin lurus
           setServoAngle(SERVO_SIKUKANAN, 90);;//-kanan +kiri
           delay(50);
         }
@@ -530,13 +531,13 @@ void handleAtkState() {
          setServoAngle(SERVO_PINGGANG, 60);
          setServoAngle(SERVO_SIKUKANAN, 90);;//-kanan +kiri
          delay(50);
-        } else if (currentTime - lastAtkTime < 600) {
+        } else if (currentTime - lastAtkTime < 400) {
           setServoAngle(SERVO_PINGGANG, 120);
           setServoAngle(SERVO_PUNGGUNG, 40);
           setServoAngle(SERVO_BAHUKANAN, 100);
-          setServoAngle(SERVO_LUTUTKIRI , 120);// -semakin besar semakin lurus
-          setServoAngle(SERVO_TELAPAKKIRI , 60);// -semakin kecil semakin maju
+          // setServoAngle(SERVO_LUTUTKIRI , 120);// -semakin besar semakin lurus
           setServoAngle(SERVO_SIKUKANAN, 90);;//-kanan +kiri
+          // setServoAngle(SERVO_KAKIKIRI, 20);// -semakin kecil semakin kedepan
           delay(50);
         }
           else {
