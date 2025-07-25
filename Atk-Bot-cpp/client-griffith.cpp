@@ -35,7 +35,7 @@ const char* ssid = "Alamak";
 const char* password = "ndaktaukoktanyasaya";
 
 // Konfigurasi Server
-const char* serverIP = "10.233.195.2";
+const char* serverIP = "10.233.";
 const int serverPort = 50003;
 
 // Konfigurasi Klien
