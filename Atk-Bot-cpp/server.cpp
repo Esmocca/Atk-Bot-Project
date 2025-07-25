@@ -1,33 +1,46 @@
 #include <WiFi.h>
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+// #include <LiquidCrystal_I2C.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
-#define LCD_SDA 16
-#define LCD_SCL 17
+// OLED
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET    -1
+// #define LCD_SDA 16
+// #define LCD_SCL 17
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, -1);
 
-
-const char* ssid = "-----";
-const char* password = "--------";
-int port = 50---;
+const char* ssid = "Alamak";
+const char* password = "ndaktaukoktanyasaya";
+int port = 50003;
 WiFiServer server(port);
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+// Button pins
+const int hpbuffPins = 11;
+const int atkbuffPins = 12;
+const int deffbuffPins = 13;
+const int strbuffPins = 14;
+const int engybuffPins = 15;
 
-byte fullBar[8] = {
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111
-};
+// LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// byte fullBar[8] = {
+//   0b11111,
+//   0b11111,
+//   0b11111,
+//   0b11111,
+//   0b11111,
+//   0b11111,
+//   0b11111,
+//   0b11111
+// };
 
 struct ClientData {
   WiFiClient client;
   String name;
-  int lifePoints = 3;
+  // int lifePoints = 3;
 };
 
 template <class T>
@@ -90,7 +103,8 @@ public:
 };
 
 DoublyLinkedList<ClientData> clientList;
-bool gameStarted = false;
+// bool gameStarted = false;
+bool serverReady = false;
 
 void connectToWiFi() {
   if (WiFi.status() != WL_CONNECTED) {
@@ -100,51 +114,72 @@ void connectToWiFi() {
     }
     server.begin();
     
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("IP: ");
-    lcd.print(WiFi.localIP());
-    lcd.setCursor(0, 1);
-    lcd.print("Port: ");
-    lcd.print(port);
+    // lcd.clear();
+    // lcd.setCursor(0, 0);
+    // lcd.print("IP: ");
+    // lcd.print(WiFi.localIP());
+    // lcd.setCursor(0, 1);
+    // lcd.print("Port: ");
+    // lcd.print(port);
+
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor(0, 0);
+    display.print("IP: ");
+    display.println(WiFi.localIP());
+    display.print("Port: ");
+    display.println(port);
+    display.display();
   }
 }
 
-void displayGameStart() {
-  lcd.clear();
-  lcd.setCursor(3, 0);
-  lcd.print("Game Start!");
-  delay(3000);
-  gameStarted = true;
+// void displayGameStart() {
+//   lcd.clear();
+//   lcd.setCursor(3, 0);
+//   lcd.print("Game Start!");
+//   delay(3000);
+//   gameStarted = true;
+// }
+
+void displayServerReady() {
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setCursor(15, 20);
+  display.print("Server");
+  display.setCursor(25, 40);
+  display.print("Ready!");
+  display.display();
+  serverReady = true;
 }
 
-void displayScoreboard() {
-  static int lastP1LP = -1, lastP2LP = -1;
-  DNode<ClientData>* current = clientList.getHead();
-  if (!current || !current->next) return;
+// void displayScoreboard() {
+//   static int lastP1LP = -1, lastP2LP = -1;
+//   DNode<ClientData>* current = clientList.getHead();
+//   if (!current || !current->next) return;
 
-  if (current->data.lifePoints == lastP1LP && current->next->data.lifePoints == lastP2LP) {
-    return; 
-  }
+//   if (current->data.lifePoints == lastP1LP && current->next->data.lifePoints == lastP2LP) {
+//     return; 
+//   }
   
-  lastP1LP = current->data.lifePoints;
-  lastP2LP = current->next->data.lifePoints;
+//   lastP1LP = current->data.lifePoints;
+//   lastP2LP = current->next->data.lifePoints;
 
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("P1");
-  lcd.setCursor(14, 0);
-  lcd.print("P2");
+//   lcd.clear();
+//   lcd.setCursor(0, 0);
+//   lcd.print("P1");
+//   lcd.setCursor(14, 0);
+//   lcd.print("P2");
 
-  lcd.setCursor(0, 1);
-  for (int i = 0; i < current->data.lifePoints; i++) {
-    lcd.write(byte(0)); 
-  }
-  lcd.setCursor(13, 1);
-  for (int i = 0; i < current->next->data.lifePoints; i++) {
-    lcd.write(byte(0)); 
-  }
-}
+//   lcd.setCursor(0, 1);
+//   for (int i = 0; i < current->data.lifePoints; i++) {
+//     lcd.write(byte(0)); 
+//   }
+//   lcd.setCursor(13, 1);
+//   for (int i = 0; i < current->next->data.lifePoints; i++) {
+//     lcd.write(byte(0)); 
+//   }
+// }
 
 void mainServer() {
   WiFiClient newClient = server.accept();
@@ -157,38 +192,40 @@ void mainServer() {
   }
   
   if (clientList.count() == 2 && !gameStarted) {
-    displayGameStart();
+    // displayGameStart();
+    displayServerReady();
   }
   
-  if (gameStarted) {
-    displayScoreboard();
-  }
+  // if (gameStarted) {
+  //   displayScoreboard();
+  // }
 
-  bool gameOver = false;
+  // bool gameOver = false;
   
   DNode<ClientData>* current = clientList.getHead();
   while (current != nullptr) {
     WiFiClient &client = current->data.client;
+    
     if (client && client.available()) {
       String data = client.readStringUntil('\n');
       data.trim();
       Serial.println("Received: " + data);
 
-      if (data.endsWith("defeated!")) {
-        current->data.lifePoints--;
+      // if (data.endsWith("defeated!")) {
+      //   current->data.lifePoints--;
         
-        if (current->data.lifePoints == 0) {
-          gameOver = true;
-          lcd.clear();
-          lcd.setCursor(3, 0);
-          lcd.print("Game Over");
-          //lcd.print(current->next ? current->next->data.name : "?");
-          delay(5000);
-          lcd.clear();
-          gameStarted = false;
-          break;
-        }
-      }
+      //   if (current->data.lifePoints == 0) {
+      //     gameOver = true;
+      //     lcd.clear();
+      //     lcd.setCursor(3, 0);
+      //     lcd.print("Game Over");
+      //     //lcd.print(current->next ? current->next->data.name : "?");
+      //     delay(5000);
+      //     lcd.clear();
+      //     gameStarted = false;
+      //     break;
+      //   }
+      // }
 
       DNode<ClientData>* receiver =  clientList.getHead();
       while (receiver != nullptr){
@@ -197,7 +234,7 @@ void mainServer() {
         }
         receiver = receiver->next;
       }
-      displayScoreboard();
+      // displayScoreboard();
     }
 
     if (!client.connected()) {
@@ -209,33 +246,47 @@ void mainServer() {
     }
   }
   
-  if (clientList.count() == 2) {
-    DNode<ClientData>* p1 = clientList.getHead();
-    DNode<ClientData>* p2 = p1->next;
-    if (p1->data.lifePoints == 0 && p2->data.lifePoints == 0) {
-      lcd.clear();
-      lcd.setCursor(3, 0);
-      lcd.print("DRAW!");
-      delay(5000);
-      lcd.clear();
-      gameStarted = false;
-    }
-  }
+  // if (clientList.count() == 2) {
+  //   DNode<ClientData>* p1 = clientList.getHead();
+  //   DNode<ClientData>* p2 = p1->next;
+  //   if (p1->data.lifePoints == 0 && p2->data.lifePoints == 0) {
+  //     lcd.clear();
+  //     lcd.setCursor(3, 0);
+  //     lcd.print("DRAW!");
+  //     delay(5000);
+  //     lcd.clear();
+  //     gameStarted = false;
+  //   }
+  // }
 }
 
 
 void setup() {
   Serial.begin(115200);
-  Wire.setSDA(LCD_SDA);
-  Wire.setSCL(LCD_SCL);
+
+  Wire.setSDA(16);
+  Wire.setSCL(17);
   Wire.begin();
-  lcd.init();
-  lcd.backlight();
-  lcd.createChar(0, fullBar); 
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Wi-Fi Connecting...");
-  delay(2000);
+
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("SSD1306 failed to start"));
+    while (true);
+  }
+  // lcd.init();
+  // lcd.backlight();
+  // lcd.createChar(0, fullBar); 
+  // lcd.clear();
+  // lcd.setCursor(0, 0);
+  // lcd.print("Wi-Fi Connecting...");
+  // delay(2000);
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.print("Connecting WiFi...");
+  display.display();
+  delay(1000);
+  
   connectToWiFi();
 }
 
