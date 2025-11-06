@@ -1,20 +1,20 @@
 #include <WiFi.h>
 #include <Wire.h>
-// #include <LiquidCrystal_I2C.h>
+#include <LiquidCrystal_I2C.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
 // OLED
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64
-#define OLED_RESET    -1
+// #define SCREEN_WIDTH 128
+// #define SCREEN_HEIGHT 64
+// #define OLED_RESET    -1
 // #define LCD_SDA 16
 // #define LCD_SCL 17
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, -1);
+// Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, -1);
 
 const char* ssid = "Alamak";
 const char* password = "ndaktaukoktanyasaya";
-int port = 50003;
+int port = *****;
 WiFiServer server(port);
 
 // Button pins
@@ -24,7 +24,7 @@ const int deffbuffPins = 13;
 const int strbuffPins = 14;
 const int engybuffPins = 15;
 
-// LiquidCrystal_I2C lcd(0x27, 16, 2);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // byte fullBar[8] = {
 //   0b11111,
@@ -103,7 +103,7 @@ public:
 };
 
 DoublyLinkedList<ClientData> clientList;
-// bool gameStarted = false;
+bool gameStarted = false;
 bool serverReady = false;
 
 void connectToWiFi() {
@@ -114,23 +114,25 @@ void connectToWiFi() {
     }
     server.begin();
     
-    // lcd.clear();
-    // lcd.setCursor(0, 0);
-    // lcd.print("IP: ");
-    // lcd.print(WiFi.localIP());
-    // lcd.setCursor(0, 1);
-    // lcd.print("Port: ");
-    // lcd.print(port);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("IP: ");
+    lcd.print(WiFi.localIP());
+    lcd.setCursor(0, 1);
+    lcd.print("Port: ");
+    lcd.print(port);
 
-    display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(SSD1306_WHITE);
-    display.setCursor(0, 0);
-    display.print("IP: ");
-    display.println(WiFi.localIP());
-    display.print("Port: ");
-    display.println(port);
-    display.display();
+    // display.clearDisplay();
+    // display.setTextSize(1);
+    // display.setTextColor(SSD1306_WHITE);
+    // display.setCursor(0, 0);
+    // display.print("IP: ");
+    // display.println(WiFi.localIP());
+    // Serial.println(WiFi.localIP());
+    // display.print("Port: ");
+    // display.println(port);
+    // Serial.println(port);
+    // display.display();
   }
 }
 
@@ -143,14 +145,20 @@ void connectToWiFi() {
 // }
 
 void displayServerReady() {
-  display.clearDisplay();
-  display.setTextSize(2);
-  display.setCursor(15, 20);
-  display.print("Server");
-  display.setCursor(25, 40);
-  display.print("Ready!");
-  display.display();
+  // display.clearDisplay();
+  // display.setTextSize(2);
+  // display.setCursor(15, 20);
+  // display.print("Server");
+  // display.setCursor(25, 40);
+  // display.print("Ready!");
+  // display.display();
+
+//LCD 16x2
+  lcd.clear();
+  lcd.setCursor(3, 0);
+  lcd.print("Server Ready!");
   serverReady = true;
+
 }
 
 // void displayScoreboard() {
@@ -263,28 +271,36 @@ void mainServer() {
 
 void setup() {
   Serial.begin(115200);
-
   Wire.setSDA(16);
   Wire.setSCL(17);
   Wire.begin();
+  lcd.init();
+  lcd.backlight();
 
-  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println(F("SSD1306 failed to start"));
-    while (true);
-  }
-  // lcd.init();
-  // lcd.backlight();
-  // lcd.createChar(0, fullBar); 
-  // lcd.clear();
-  // lcd.setCursor(0, 0);
-  // lcd.print("Wi-Fi Connecting...");
-  // delay(2000);
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
-  display.setCursor(0, 0);
-  display.print("Connecting WiFi...");
-  display.display();
+
+//OLED
+  // if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+  //   Serial.println(F("SSD1306 failed to start"));
+  //   while (true);
+  // }
+  // // lcd.init();
+  // // lcd.backlight();
+  // // lcd.createChar(0, fullBar); 
+  // // lcd.clear();
+  // // lcd.setCursor(0, 0);
+  // // lcd.print("Wi-Fi Connecting...");
+  // // delay(2000);
+  // display.clearDisplay();
+  // display.setTextSize(1);
+  // display.setTextColor(SSD1306_WHITE);
+  // display.setCursor(0, 0);
+  // display.print("Connecting WiFi...");
+  // display.display();
+  // delay(1000);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("WiFi Connecting...");
   delay(1000);
   
   connectToWiFi();
