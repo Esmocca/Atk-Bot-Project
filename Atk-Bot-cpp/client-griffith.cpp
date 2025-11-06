@@ -1,4 +1,13 @@
-// Hab-w weapon stance position
+/*
+ * ========================================
+ * ROBOT BATTLE SYSTEM - RASPBERRY PI PICO W
+ * ========================================
+ * Handcombat stance
+ * Client Name: Griffith
+ * Update : Enable reset all time
+ * ========================================
+ */
+
 #include <WiFi.h>
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
@@ -35,8 +44,8 @@ const char* ssid = "Alamak";
 const char* password = "ndaktaukoktanyasaya";
 
 // Konfigurasi Server
-const char* serverIP = "10.233.";
-const int serverPort = 50003;
+const char* serverIP = "10.**.***.*";
+const int serverPort = 50***;
 
 // Konfigurasi Klien
 const String clientName = "Esmocca"; // Ganti untuk client kedua
@@ -48,12 +57,13 @@ int defense = 30; // Defense dalam persen (misalnya 20 berarti mengurangi damage
 int strength = 10;   // Strength dalam persen (misalnya 10 berarti menambah 10% damage dari atk)
 int energy = 150;
 const int energyMax = 150;
-const int energyRegen = 10;
-const unsigned long energyInterval = 10000;
+const int energyRegen = 40;
+const unsigned long energyInterval = 5000;
 bool robotAlive = true;
 int hpstats = hp;
 
 // Button pins
+const int skillPin = 12;
 const int resetPin = 13;
 const int atkPin = 14;
 const int blockPin = 15;
@@ -70,9 +80,17 @@ int button_state = 0;
 unsigned long lastAtkTime = 0, atkInterval = 500;  // Attack timing
 bool isAttacking = false;
 
+//Skill button
+int skill_state = 0;
+unsigned long lastSkill = 0, skillInterval = 500;
+bool isSkill = false;
+
+
 // Timing Variables
 unsigned long lastRegen = 0;
 unsigned long lastAttack = 0;
+// unsigned long lastSkill = 0;
+bool skillReleased = true;
 bool atkReleased = true;
 
 // Variabel untuk animasi
@@ -113,6 +131,7 @@ void setup() {
     pinMode(atkPin, INPUT_PULLUP);
     pinMode(blockPin, INPUT_PULLUP);
     pinMode(resetPin, INPUT_PULLUP);
+    pinMode(skillPin, INPUT_PULLUP);
 
     setIdlePosition();
     connectToWiFi();
@@ -185,18 +204,20 @@ void handleServer() {
       int incomingDamage = data.substring(4).toInt();
       //handleDamage(data.substring(4).toInt());
       handleDamage(incomingDamage);
+    } else if (data.startsWith("Buff")) {
+      handleBuff(data);
     }
   }
 }
 
 void setIdlePosition() {
   setServoAngle(SERVO_BAHUKANAN, 80);//-kanan +kiri
-  setServoAngle(SERVO_TANGANKIRI, 130);// - semakin kecil semakin kedepan
+  setServoAngle(SERVO_SIKUKANAN, 60);//- semakin kecil semakin kebelakang
+  setServoAngle(SERVO_TANGANKIRI, 110);// - semakin kecil semakin kedepan
   setServoAngle(SERVO_PUNGGUNG, 75);//-semakin kecil semakin naik
-  setServoAngle(SERVO_SIKUKANAN, 40);//- semakin kecil semakin kebelakang
   setServoAngle(SERVO_PINGGANG, 40);//-semakin besar semakin ke kiri
-  setServoAngle(SERVO_KAKIKANAN, 70);// -semakin besar semakin kedepan
-  setServoAngle(SERVO_KAKIKIRI, 25);// -semakin kecil semakin kedepan
+  setServoAngle(SERVO_KAKIKANAN, 80);// -semakin besar semakin kedepan
+  setServoAngle(SERVO_KAKIKIRI, 15);// -semakin kecil semakin kedepan
   setServoAngle(SERVO_LUTUTKANAN , 10);// -semakin kecil semakin lurus
   setServoAngle(SERVO_LUTUTKIRI , 130);// -semakin besar semakin lurus
   setServoAngle(SERVO_TELAPAKKANAN , 65);// -semakin besar semakin maju
@@ -227,6 +248,32 @@ void handleEnergy() {
   if (millis() - lastRegen >= energyInterval) {
     energy = min(energy + energyRegen, energyMax);
     lastRegen = millis();
+  }
+}
+
+void handleBuff(const String& command) {
+  if (command.indexOf("HP") > 0) {
+    hp = hp + hp / 10;
+    hpstats = hp;
+    Serial.println("HP Buffed +10%");
+    displayPrint("HP Buff +10%");
+  } else if (command.indexOf("ATK") > 0) {
+    atk = atk + atk / 10;
+    Serial.println("ATK Buffed +10%");
+    displayPrint("ATK Buff +10%");
+  } else if (command.indexOf("DEF") > 0) {
+    defense = defense + defense / 10;
+    Serial.println("DEF Buffed +10%");
+    displayPrint("DEF Buff +10%");
+  } else if (command.indexOf("STR") > 0) {
+    strength = strength + strength / 10;
+    Serial.println("STR Buffed +10%");
+    displayPrint("STR Buff +10%");
+  } else if (command.indexOf("ENGY") > 0) {
+    energy = energy + energy / 10;
+    energy = min(energy, energyMax);
+    Serial.println("Energy Buffed +10%");
+    displayPrint("ENGY Buff +10%");
   }
 }
 
@@ -345,27 +392,65 @@ void handleDefeatMotion() {
   }
 }
 
+// void checkReset() {
+//     if (!robotAlive) {
+//         static unsigned long resetStart = 0;
+//         if (digitalRead(resetPin) == LOW) {
+//             if (resetStart == 0) {
+//                 resetStart = millis();
+//                 displayPrint("Resetting...");
+//             } else if (millis() - resetStart > 5000) {
+//                 hp = hpstats;
+//                 energy = energyMax;
+//                 robotAlive = true;
+//                 defeatAnimationStep = 0;
+//                 //connectToServer();
+//                 setIdlePosition();
+//                 displayPrint("Reboot Complete!");
+//             }
+//         } else {
+//             resetStart = 0;
+//         }
+//     }
+// }
+
+
 void checkReset() {
-    if (!robotAlive) {
-        static unsigned long resetStart = 0;
-        if (digitalRead(resetPin) == LOW) {
-            if (resetStart == 0) {
-                resetStart = millis();
-                displayPrint("Resetting...");
-            } else if (millis() - resetStart > 5000) {
-                hp = hpstats;
-                energy = energyMax;
-                robotAlive = true;
-                defeatAnimationStep = 0;
-                //connectToServer();
-                setIdlePosition();
-                displayPrint("Reboot Complete!");
-            }
-        } else {
-            resetStart = 0;
-        }
+  static unsigned long resetStart = 0;
+
+  // Jika tombol reset ditekan
+  if (digitalRead(resetPin) == LOW) {
+    if (resetStart == 0) {
+      resetStart = millis();
+    } 
+    else if (millis() - resetStart > 5000) {
+      // Reset semua parameter
+      hp = hpstats;
+      energy = energyMax;
+      robotAlive = true;
+      defeatAnimationStep = 0;
+      isAttacking = false;
+      isBlocking = false;
+      isHitAnimating = false;
+      blockingAtkMotionActive = false;
+      setIdlePosition();
+      
+      // Koneksi ulang ke server jika belum tersambung
+      if (!client.connected()) {
+        connectToServer();
+      }
+
+      displayPrint("Reboot Complete!");
+      Serial.println("System Reset!");
+      delay(1500);
+      resetStart = 0; // Reset timer
     }
+  } 
+  else {
+    resetStart = 0; // Jika tombol dilepas sebelum 5 detik
+  }
 }
+
 
 void sendAttack() {
   // Tambahkan bonus damage berdasarkan strength
@@ -396,6 +481,8 @@ void BlockState() //Blocking menggunakan millis
     if (currentTime - lastBlockTime < 400) {
       setServoAngle(SERVO_TANGANKIRI,90);
       setServoAngle(SERVO_PINGGANG, 20);
+      setServoAngle(SERVO_BAHUKANAN, 150);//-kanan +kiri
+      setServoAngle(SERVO_SIKUKANAN, 120);//- semakin kecil semakin kebelakang
       // setServoAngle(SERVO_BAHUKANAN, 100);//-kanan +kiri
       // setServoAngle(SERVO_PUNGGUNG, 110);//+turun -naik
       delay(50);
@@ -439,12 +526,13 @@ void setIdleAnimation()
         step = -step;
       }
       // Terapkan pergeseran offset ke beberapa servo
-      setServoAngle(SERVO_BAHUKANAN, 80 + offset);   // Contoh: Bahu kanan
-      setServoAngle(SERVO_PUNGGUNG, 75 + offset);      // Punggung
-      setServoAngle(SERVO_SIKUKANAN, 60 + offset);      // Siku kanan
-      setServoAngle(SERVO_PINGGANG, 40 + offset);       // Pinggang
-      // setServoAngle(SERVO_KAKIKANAN, 70 + offset);      // Kaki kanan
-      // setServoAngle(SERVO_KAKIKIRI, 30 + offset);       // Kaki kiri
+       setServoAngle(SERVO_BAHUKANAN, 80 + offset);   // Contoh: Bahu kanan
+       setServoAngle(SERVO_PUNGGUNG, 75 + offset);      // Punggung
+       setServoAngle(SERVO_SIKUKANAN, 60 + offset);      // Siku kanan
+       setServoAngle(SERVO_PINGGANG, 40 + offset);       // Pinggang
+       setServoAngle(SERVO_TANGANKIRI, 110 + offset);// - semakin kecil semakin kedepan
+      // // setServoAngle(SERVO_KAKIKANAN, 70 + offset);      // Kaki kanan
+      // // setServoAngle(SERVO_KAKIKIRI, 30 + offset);       // Kaki kiri
     }
   }
 }
@@ -473,7 +561,6 @@ void handleAtkState() {
   }
   if (isAttacking) {
     unsigned long currentTime = millis();
-
     switch (animationIndex) {
       case 0:  // Animasi serangan 1
         if (currentTime - lastAtkTime < 200) {
@@ -483,18 +570,17 @@ void handleAtkState() {
           // setServoAngle(SERVO_LUTUTKIRI , 120);// -semakin besar semakin lurus
           setServoAngle(SERVO_SIKUKANAN, 80);//- semakin kecil semakin kebelakang
           // setServoAngle(SERVO_KAKIKIRI, 20);// -semakin kecil semakin kedepan
-          delay(50);
         } else if (currentTime - lastAtkTime < 500) {
           setServoAngle(SERVO_PINGGANG, 20);
           setServoAngle(SERVO_PUNGGUNG, 50);
           setServoAngle(SERVO_BAHUKANAN, 40);
           setServoAngle(SERVO_SIKUKANAN, 90);;//-kanan +kiri
-          delay(50);
         } else {
           isAttacking = false;
           animationIndex = (animationIndex + 1) % 3;  // Pindah ke animasi berikutnya
           setIdlePosition();
           Serial.println("Attack 1 ended.");
+          delay(50);
           atkReleased = true;
         }
         break;
@@ -507,30 +593,28 @@ void handleAtkState() {
           setServoAngle(SERVO_BAHUKANAN, 90);
           setServoAngle(SERVO_SIKUKANAN, 90);//- semakin kecil semakin kebelakang
           // setServoAngle(SERVO_KAKIKIRI, 20);// -semakin kecil semakin kedepan
-          delay(50);
         } else if (currentTime - lastAtkTime < 500) {
           setServoAngle(SERVO_PUNGGUNG, 50);
           setServoAngle(SERVO_PINGGANG, 120);
           setServoAngle(SERVO_BAHUKANAN, 140);
           // setServoAngle(SERVO_LUTUTKIRI , 120);// -semakin besar semakin lurus
           setServoAngle(SERVO_SIKUKANAN, 90);;//-kanan +kiri
-          delay(50);
         }
          else {
           isAttacking = false;
           animationIndex = (animationIndex + 1) % 3;  // Pindah ke animasi berikutnya
           setIdlePosition();
           Serial.println("Attack 2 ended.");
+          delay(50);
           atkReleased = true;
         }
         break;
 
       case 2:  // Animasi serangan 3 -+
         if (currentTime - lastAtkTime < 200) {
-
          setServoAngle(SERVO_PINGGANG, 60);
          setServoAngle(SERVO_SIKUKANAN, 90);;//-kanan +kiri
-         delay(50);
+
         } else if (currentTime - lastAtkTime < 400) {
           setServoAngle(SERVO_PINGGANG, 120);
           setServoAngle(SERVO_PUNGGUNG, 40);
@@ -538,13 +622,13 @@ void handleAtkState() {
           // setServoAngle(SERVO_LUTUTKIRI , 120);// -semakin besar semakin lurus
           setServoAngle(SERVO_SIKUKANAN, 90);;//-kanan +kiri
           // setServoAngle(SERVO_KAKIKIRI, 20);// -semakin kecil semakin kedepan
-          delay(50);
         }
           else {
           isAttacking = false;
           animationIndex = (animationIndex + 1) % 3;  // Pindah ke animasi berikutnya
           setIdlePosition();
           Serial.println("Attack 3 ended.");
+          delay(50);
           atkReleased = true;
         }
         break;
@@ -559,6 +643,8 @@ void handleAtkState() {
 
 
 void loop() {
+  checkReset();
+
   if (!robotAlive) {
     handleDefeatMotion();
     checkReset();
