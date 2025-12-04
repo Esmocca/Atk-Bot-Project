@@ -1,41 +1,58 @@
-# Atk-bot-Project
-Atk bot project log:
+# 🤖 ATK Bot – Humanoid Project HABW
 
-Plan HAB-W programs :
-HAB-W : Humanoid Atk Bot Wi-fi
-- Tambahkan stance position (weapon)✔️
-- Aktifkan skill button❌
-- Use skill cooldown?✔️
-- Tambahkan crit rate& crit dmg pada skill❌
-- Monitoring oled lcd (tidak terdeteksi)❌
-- ir signal for physical dmg (tidak digunakan karena ir receiver tidak menerima sinyal secara konstan) ❌
-- kembali ke led untuk indikator ✔️
-- mana system ❌
+ATK Bot adalah proyek **humanoid robot** berbasis **Raspberry Pi Pico W** yang mengontrol beberapa servo menggunakan **PCA9685**, dilengkapi **OLED display** dan **LCD I2C** untuk menampilkan status serta mekanisme *action-trigger* berbasis button.
 
-------Addable content------
-- Team party/ team play?❌
+Project ini dibuat sebagai bagian dari **HABW (Humanoid ATK Bot Warrior)** — robot kecil yang mampu melakukan pose, animasi gerak, dan menampilkan informasi status secara real-time.
 
------Future plan-----
-- Robot dapat mengirim sinyal menggunakan wifi satu sama lain dalam bentuk elemental atk atau atk value character bukan dalam komunikasi sensor apapun ✔️
--gunakan server sebagai jembatan komunikasi agar lebih lancar jika client disconnected✔️
+---
 
-----Komunikasi Wi-Fi robot----
+## 🚀 Fitur Utama
 
-- digunakan untuk typical atk value✔️
-- elemental skill application✔️
-- memberi buff untuk player✔️
-- attack consume energy if use by 30%, energy can regenerate every 10 seconds✔️
-- tambahkan stats energy% ✔️
+### 🦾 **Servo Control (7 DOF)**
+Menggunakan modul **PCA9685** untuk mengontrol 7 buah servo:
+- Punggung  
+- Tangan kanan  
+- Tangan kiri  
+- Siku kanan  
+- Pinggang  
+- Kaki kanan  
+- Kaki kiri  
 
-Next update:
--> berikan sinyal jika robot defeated✔️
--> hold reset button for 5 secs to reset ✔️
--> scoreboard & gamecontrols on server?
--> next update pcb cuman pake raspy & step up + banyakin pin buat tombol, speaker, dan sensor✔️
--> update servo kaki dan hilangkan stand untuk motion defeated dan motion berdiri✔️
--> pake output power supply
--> motion idle ✔️
+### 📟 **Display System**
+- **OLED kanan & kiri** → status koneksi klien + font RPG  
+- **LCD 16x2 I2C** → *scoreboard* berupa bar yang berkurang ketika sinyal `"Griffith defeated!"` atau `"Stellar defeated!"` diterima
 
-Plan update : 
--> parry system logic, jadi char tidak perlu membawa shield dan menhilangkan spam block button (zzz references)
--> cards buff detection on server controls
+### 🔘 **Button Trigger**
+- Tombol untuk menjalankan animasi servo  
+- Mode aksi bisa dikembangkan (attack, defend, idle, victory, dsb.)
+
+### 🛜 **Network Integration**
+- Raspberry Pi Pico W dapat menerima sinyal dari server melalui API/WebSocket  
+- Display dan servo bergerak mengikuti status server
+
+---
+
+## 🧰 Hardware yang Digunakan
+- Raspberry Pi Pico W  
+- PCA9685 Servo Driver  
+- 7× SG90 / MG996R Servo  
+- OLED 128x64 (I2C)  
+- LCD 16x2 (I2C)  
+- Push Button (aktif LOW)  
+- Power module servo (5–6V)
+
+---
+
+## 🧪 Software & Library
+- **Arduino IDE (C++)**  
+- Library:
+  - `Adafruit_PWMServoDriver` (PCA9685)
+  - `Wire.h`
+  - `LiquidCrystal_I2C`
+  - Library OLED (U8g2 / Adafruit SSD1306 — sesuaikan proyek)
+  - `WiFi.h` (untuk Pico W)
+  - `HTTPClient` / WebSocket Client (opsional)
+
+---
+
+## 📂 Struktur Proyek
