@@ -3,9 +3,9 @@
 ## 📘 Description
 **ATK BOT WI-FI** adalah sistem **multiplayer humanoid robot** berbasis Wi-Fi yang memungkinkan dua robot berkomunikasi melalui server bot.  
 Project ini terdiri dari **1 server** dan **2 humanoid robots** yang saling terhubung secara nirkabel untuk memulai permainan, mengirim status, serta mengeksekusi aksi robot.
-note: projek ini menggunakan raspberry untuk main pengelolan program komunikasi dan arduino nano untuk program motion dan projek ini tidak lagi dikembangkan
 
 Dengan memanfaatkan kombinasi **Raspberry Pi Pico W** sebagai modul komunikasi dan **Arduino Nano** sebagai pengontrol gerakan robot, sistem ini menghadirkan robot battle yang responsif dan real-time.
+note: projek ini menggunakan raspberry untuk main pengelolan program komunikasi dan arduino nano untuk program motion dan projek ini tidak lagi dikembangkan
 
 ---
 
