@@ -50,7 +50,7 @@ Versi ini **hanya arsip** dan tidak digunakan lagi.
 
 ---
 
-# 🔄 Migration to New Version
+# 🔄 New Version
 
 ### NEW SYSTEM:
 - Hanya **1** microcontroller → **Raspberry Pi Pico W**
@@ -64,11 +64,6 @@ Versi ini **hanya arsip** dan tidak digunakan lagi.
 - Mengurangi konsumsi daya  
 - Memudahkan debugging & update firmware  
 - Pico W lebih powerful untuk handle multitasking  
-
----
-
-# 📜 License
-MIT License — proyek ini dapat digunakan sebagai referensi atau pembelajaran.
 
 ---
 
