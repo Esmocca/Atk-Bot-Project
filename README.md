@@ -52,5 +52,16 @@ Menggunakan modul **PCA9685** untuk mengontrol 7 buah servo:
   - Library OLED (U8g2 / Adafruit SSD1306 — sesuaikan proyek)
   - `WiFi.h` (untuk Pico W)
  
-    
+---
+
+## 🧠 Cara Kerja Sistem
+1. Robot boot → masuk mode standby  
+2. OLED menampilkan status *connecting*  
+3. Setelah terhubung, kedua OLED menampilkan status klien  
+4. LCD menjadi scoreboard pertandingan  
+5. Saat tombol ditekan → robot bergerak sesuai animasi servo  
+6. Server mengirim sinyal `"Griffith defeated!"` atau `"Stellar defeated!"`  
+7. Scoreboard bar berkurang → jika habis → tampilkan pemenang  
+8. Robot dapat menampilkan animasi *victory pose*  
+
 ---
