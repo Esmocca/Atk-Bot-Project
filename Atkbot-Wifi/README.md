@@ -5,7 +5,8 @@
 Project ini terdiri dari **1 server** dan **2 humanoid robots** yang saling terhubung secara nirkabel untuk memulai permainan, mengirim status, serta mengeksekusi aksi robot.
 
 Dengan memanfaatkan kombinasi **Raspberry Pi Pico W** sebagai modul komunikasi dan **Arduino Nano** sebagai pengontrol gerakan robot, sistem ini menghadirkan robot battle yang responsif dan real-time.
-note: projek ini menggunakan raspberry untuk main pengelolan program komunikasi dan arduino nano untuk program motion dan projek ini tidak lagi dikembangkan
+
+note: projek ini menggunakan raspberry untuk main pengelolaan program komunikasi dan arduino nano untuk program motion dan projek ini tidak lagi dikembangkan.
 
 ---
 
