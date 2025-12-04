@@ -1,57 +1,84 @@
-# 🤖 ATK BOT WI-FI
+# 📡 ATK BOT WI-FI (Deprecated)
 
-## 📘 Description
-**ATK BOT WI-FI** adalah sistem **multiplayer humanoid robot** berbasis Wi-Fi yang memungkinkan dua robot berkomunikasi melalui server bot.  
-Project ini terdiri dari **1 server** dan **2 humanoid robots** yang saling terhubung secara nirkabel untuk memulai permainan, mengirim status, serta mengeksekusi aksi robot.
+## ⚠️ Project Status: No Longer Developed
+Proyek **ATK BOT WI-FI** versi ini **sudah dihentikan pengembangannya**.  
+Versi ini awalnya menggunakan **dua mikrokontroler**:
+- Raspberry Pi Pico W → Wi-Fi & komunikasi server  
+- Arduino Nano → Motion control humanoid robot  
 
-Dengan memanfaatkan kombinasi **Raspberry Pi Pico W** sebagai modul komunikasi dan **Arduino Nano** sebagai pengontrol gerakan robot, sistem ini menghadirkan robot battle yang responsif dan real-time.
+Namun kini seluruh sistem telah diperbarui dan **digantikan oleh versi baru** yang:
+- **Tidak lagi menggunakan Arduino Nano**
+- **Menggunakan Raspberry Pi Pico W saja sebagai kontrol utama**
+- Memiliki sistem gerakan + komunikasi yang digabung dalam satu file utama
 
-note: projek ini menggunakan raspberry untuk main pengelolaan program komunikasi dan arduino nano untuk program motion dan projek ini tidak lagi dikembangkan.
+🔄 **Update terbaru dapat ditemukan di file:**  
 
 ---
 
-## 🛠️ Tools & Parts
+## 📝 Project Description (Old Version)
 
-### 1. **Microcontrollers**
+ATK BOT WI-FI adalah sistem humanoid robot **multiplayer** yang dapat:
+- Terhubung ke server melalui Wi-Fi  
+- Mengirim status robot secara real-time  
+- Menjalankan animasi gerakan melalui Arduino Nano  
+- Memulai game apabila kedua robot terkoneksi
+
+Versi ini **hanya arsip** dan tidak digunakan lagi.
+
+---
+
+## 🛠️ Tools & Parts (Old Version)
+
+### 1. Microcontrollers
 - **Raspberry Pi Pico W**  
-  → Mengatur komunikasi Wi-Fi, koneksi server, dan protokol multiplayer  
-- **Arduino Nano**  
-  → Menjalankan kontrol gerakan robot / motion engine
+  → Untuk Wi-Fi, client communication, status robot  
+- **Arduino Nano** *(deprecated)*  
+  → Kontrol servo & motion robot
+
+### 2. I2C parts
+- **PCA9685** – Driver servo  
+- **OLED LCD** – UI status koneksi & mode robot  
+
+### 3. Small Components
+- LDR  
+- LED Indicator  
+- Buttons  
+- Wires  
+- Resistor 10kΩ (pull-up/down)  
+- Resistor 220Ω (LED)  
+- Pin header  
 
 ---
 
-### 2. **I2C Parts**
-- **PCA9685**  
-  → Driver servo untuk mengontrol banyak servo secara efisien  
-- **OLED LCD**  
-  → Menampilkan status robot, koneksi, mode game, atau UI mini
+---
+
+# 🔄 Migration to New Version
+
+### NEW SYSTEM:
+- Hanya **1** microcontroller → **Raspberry Pi Pico W**
+- Semua logic Wi-Fi + controller + motion → digabung ke satu program
+- Menggunakan `atk_bot.cpp` sebagai source utama
+- Arduino Nano **dihapus sepenuhnya**
+
+### Alasan Perubahan:
+- Menyederhanakan wiring  
+- Mengurangi latency Wi-Fi → Arduino  
+- Mengurangi konsumsi daya  
+- Memudahkan debugging & update firmware  
+- Pico W lebih powerful untuk handle multitasking  
 
 ---
 
-### 3. **Small Parts**
-- **Light Dependent Resistors (LDR)**  
-  → Sensor cahaya untuk mekanisme trigger atau input tambahan  
-- **LED**  
-  → Indikator status, sinyal game, atau debugging  
-- **Buttons**  
-  → Untuk memulai game, reset, atau input manual  
-- **Wires**  
-  → Penghubung antar komponen  
-- **Resistor 10kΩ**  
-  → Pull-up/pull-down untuk tombol dan sensor  
-- **Resistor 220Ω**  
-  → Pembatas arus LED  
-- **Pin Header (opsional)**  
-  → Memudahkan pemasangan modul dan microcontroller
+# 📜 License
+MIT License — proyek ini dapat digunakan sebagai referensi atau pembelajaran.
 
 ---
 
-## 📡 System Overview
-- Server menerima koneksi dari kedua robot  
-- Pico W masing-masing robot terhubung ke server menggunakan Wi-Fi  
-- Server mengirimkan sinyal *start game*, status pemain, dan event battle  
-- Arduino Nano menerima perintah dari Pico W dan menjalankan animasi servo  
-- OLED menampilkan status (connected, ready, playing, etc.)  
-- PCA9685 menggerakkan servo untuk pose atau aksi robot  
+# ✨ Credits
+ATK BOT Project Development Team – Humanoid Wi-Fi Robotics System (Legacy Version)
 
 ---
+
+# 📁 For the New Version
+Lihat file untuk update terbaru: atk-bot cpp
+
