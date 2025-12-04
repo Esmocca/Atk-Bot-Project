@@ -11,8 +11,6 @@ Namun kini seluruh sistem telah diperbarui dan **digantikan oleh versi baru** ya
 - **Menggunakan Raspberry Pi Pico W saja sebagai kontrol utama**
 - Memiliki sistem gerakan + komunikasi yang digabung dalam satu file utama
 
-🔄 **Update terbaru dapat ditemukan di file:**  
-
 ---
 
 ## 📝 Project Description (Old Version)
@@ -71,11 +69,6 @@ Versi ini **hanya arsip** dan tidak digunakan lagi.
 
 # 📜 License
 MIT License — proyek ini dapat digunakan sebagai referensi atau pembelajaran.
-
----
-
-# ✨ Credits
-ATK BOT Project Development Team – Humanoid Wi-Fi Robotics System (Legacy Version)
 
 ---
 
