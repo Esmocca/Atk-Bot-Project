@@ -1,22 +1,55 @@
-ATK BOT WI-FI
+# 🤖 ATK BOT WI-FI
 
-Descriptions:
-multiplayer humanoid robots with wifi to start communications
-include servers and 2 robots to start the game
+## 📘 Description
+**ATK BOT WI-FI** adalah sistem **multiplayer humanoid robot** berbasis Wi-Fi yang memungkinkan dua robot berkomunikasi melalui server pusat.  
+Project ini terdiri dari **1 server** dan **2 humanoid robots** yang saling terhubung secara nirkabel untuk memulai permainan, mengirim status, serta mengeksekusi aksi robot.
 
-Tools & Parts :
-1.Microcontrollers :
--Rasberry pico w (to control wifi communications)
--Arduino Nano (to control robot motions)
-2.I2c parts :
--Pca9685
--Oled lcd 
-3.Small parts :
--Light dependent resistors
--Led 
--Buttons
--Wires
--Resistor 10k
--Resistor 220 ohm
--Pin header (if needed)
+Dengan memanfaatkan kombinasi **Raspberry Pi Pico W** sebagai modul komunikasi dan **Arduino Nano** sebagai pengontrol gerakan robot, sistem ini menghadirkan robot battle yang responsif dan real-time.
 
+---
+
+## 🛠️ Tools & Parts
+
+### 1. **Microcontrollers**
+- **Raspberry Pi Pico W**  
+  → Mengatur komunikasi Wi-Fi, koneksi server, dan protokol multiplayer  
+- **Arduino Nano**  
+  → Menjalankan kontrol gerakan robot / motion engine
+
+---
+
+### 2. **I2C Parts**
+- **PCA9685**  
+  → Driver servo untuk mengontrol banyak servo secara efisien  
+- **OLED LCD**  
+  → Menampilkan status robot, koneksi, mode game, atau UI mini
+
+---
+
+### 3. **Small Parts**
+- **Light Dependent Resistors (LDR)**  
+  → Sensor cahaya untuk mekanisme trigger atau input tambahan  
+- **LED**  
+  → Indikator status, sinyal game, atau debugging  
+- **Buttons**  
+  → Untuk memulai game, reset, atau input manual  
+- **Wires**  
+  → Penghubung antar komponen  
+- **Resistor 10kΩ**  
+  → Pull-up/pull-down untuk tombol dan sensor  
+- **Resistor 220Ω**  
+  → Pembatas arus LED  
+- **Pin Header (opsional)**  
+  → Memudahkan pemasangan modul dan microcontroller
+
+---
+
+## 📡 System Overview
+- Server menerima koneksi dari kedua robot  
+- Pico W masing-masing robot terhubung ke server menggunakan Wi-Fi  
+- Server mengirimkan sinyal *start game*, status pemain, dan event battle  
+- Arduino Nano menerima perintah dari Pico W dan menjalankan animasi servo  
+- OLED menampilkan status (connected, ready, playing, etc.)  
+- PCA9685 menggerakkan servo untuk pose atau aksi robot  
+
+---
