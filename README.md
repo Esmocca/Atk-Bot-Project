@@ -51,8 +51,6 @@ Menggunakan modul **PCA9685** untuk mengontrol 7 buah servo:
   - `LiquidCrystal_I2C`
   - Library OLED (U8g2 / Adafruit SSD1306 — sesuaikan proyek)
   - `WiFi.h` (untuk Pico W)
-  - `HTTPClient` / WebSocket Client (opsional)
-
+ 
+    
 ---
-
-## 📂 Struktur Proyek
